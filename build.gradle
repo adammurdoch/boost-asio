@@ -5,11 +5,21 @@ allprojects {
 model {
     repositories {
         libs(PrebuiltLibraries) {
-            def boostDir = "/usr/local/Cellar/boost/1.66.0"
-            def boostIncludeDir = "$boostDir/include"
-            def boostLibraryDir = "$boostDir/lib"
+            def linux = System.getProperty("os.name").toLowerCase().contains("linux")
 
-            assert new File(boostDir).exists()
+            def boostIncludeDir
+            def boostLibraryDir
+            if (linux) {
+                boostIncludeDir = "/usr/include"
+                boostLibraryDir = "/usr/lib/x86_64-linux-gnu"
+            } else {
+                // Assume macOS
+                def boostDir = "/usr/local/Cellar/boost/1.66.0"
+                assert file(boostDir).exists()
+                boostIncludeDir = "$boostDir/include"
+                boostLibraryDir = "$boostDir/lib"
+            }
+
             boostAsio {
                 headers.srcDir boostIncludeDir
             }
@@ -26,11 +36,19 @@ model {
                 }
             }
 
-            def protobufDir = "/usr/local/Cellar/protobuf/3.5.1"
-            def protobufIncludeDir = "$protobufDir/include"
-            def protobufLibraryDir = "$protobufDir/lib"
+            def protobufIncludeDir
+            def protobufLibraryDir
+            if (linux) {
+                protobufIncludeDir = "/usr/include"
+                protobufLibraryDir = "/usr/lib/x86_64-linux-gnu"
+            } else {
+                // Assume macOS
+                def protobufDir = "/usr/local/Cellar/protobuf/3.5.1"
+                assert file(protobufDir).exists()
+                protobufIncludeDir = "$protobufDir/include"
+                protobufLibraryDir = "$protobufDir/lib"
+            }
 
-            assert new File(protobufDir).exists()
             protobuf {
                 headers.srcDir protobufIncludeDir
                 binaries.withType(StaticLibraryBinary) {
